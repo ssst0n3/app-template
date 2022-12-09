@@ -1,0 +1,261 @@
+definitions:
+  auth.LoginSuccessResponse:
+    properties:
+      is_admin:
+        type: boolean
+      token:
+        type: string
+      user_id:
+        type: integer
+      username:
+        type: string
+    type: object
+  model.CreateUserBody:
+    properties:
+      is_admin:
+        type: boolean
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  model.ListUserBody:
+    properties:
+      id:
+        type: integer
+      is_admin:
+        type: boolean
+      username:
+        type: string
+    type: object
+  model.LoginModel:
+    properties:
+      password:
+        type: string
+      username:
+        type: string
+    type: object
+  model.UpdateBasicBody:
+    properties:
+      is_admin:
+        type: boolean
+      username:
+        type: string
+    type: object
+  model.UpdatePasswordBody:
+    properties:
+      password:
+        type: string
+    type: object
+  response.Base:
+    properties:
+      msg:
+        type: string
+      success:
+        type: boolean
+    type: object
+  response.CreateSuccess:
+    properties:
+      id:
+        type: integer
+      msg:
+        type: string
+      success:
+        type: boolean
+    type: object
+  router.ResponsePing:
+    properties:
+      message:
+        example: pong
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /api/v1/auth:
+    get:
+      consumes:
+      - application/json
+      description: Just for check permission, only user with admin permission will
+        get 200, otherwise will get 401; 只有管理员可以获得200,普通用户会401.
+      operationId: auth-nothing
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+        "401":
+          description: Unauthorized
+      security:
+      - ApiKeyAuth: []
+      summary: Nothing
+      tags:
+      - Auth
+    post:
+      consumes:
+      - application/json
+      operationId: auth-login
+      parameters:
+      - description: User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.LoginModel'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/auth.LoginSuccessResponse'
+      summary: Login
+      tags:
+      - Auth
+  /api/v1/user:
+    get:
+      consumes:
+      - application/json
+      description: return users
+      operationId: list-user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/model.ListUserBody'
+            type: array
+      security:
+      - ApiKeyAuth: []
+      summary: list user
+      tags:
+      - User
+    post:
+      consumes:
+      - application/json
+      description: Add a user
+      operationId: create-user
+      parameters:
+      - description: Create User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateUserBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.CreateSuccess'
+      security:
+      - ApiKeyAuth: []
+      summary: create user
+      tags:
+      - User
+  /api/v1/user/{id}/basic:
+    put:
+      consumes:
+      - application/json
+      description: updates some basic information of user
+      operationId: update-basic
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update user's basic information
+        in: body
+        name: user_update_basic_body
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdateBasicBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Base'
+      security:
+      - ApiKeyAuth: []
+      summary: update basic
+      tags:
+      - User
+  /api/v1/user/{id}/password:
+    put:
+      consumes:
+      - application/json
+      description: update user's password
+      operationId: update-password
+      parameters:
+      - description: User ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Update user's password
+        in: body
+        name: user_update_password_body
+        required: true
+        schema:
+          $ref: '#/definitions/model.UpdatePasswordBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Base'
+      security:
+      - ApiKeyAuth: []
+      summary: update password
+      tags:
+      - User
+  /api/v1/user/init:
+    post:
+      consumes:
+      - application/json
+      description: Add a user
+      operationId: anonymous-create-user
+      parameters:
+      - description: Create User
+        in: body
+        name: user
+        required: true
+        schema:
+          $ref: '#/definitions/model.CreateUserBody'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.CreateSuccess'
+      summary: create user without authentication if table user is empty
+      tags:
+      - User
+  /ping:
+    get:
+      consumes:
+      - application/json
+      description: return pong
+      operationId: ping-pong
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/router.ResponsePing'
+      summary: ping pong
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: token
+    type: apiKey
+swagger: "2.0"
