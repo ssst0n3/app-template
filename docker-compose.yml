@@ -1,0 +1,50 @@
+version: '3'
+services:
+  secret:
+    image: ssst0n3/docker_secret:v1.4.1
+    environment:
+      - "DIR_SECRET=/secret"
+      - "SECRET=MYSQL_PASSWORD_FILE,MYSQL_ROOT_PASSWORD_FILE,CERT_GIN_TLS,awesome_libs_cipher_common,lightweight_api"
+    volumes:
+      - app-template_secret:/secret
+  app:
+    image: swr.cn-south-1.myhuaweicloud.com/app-template/app:v0.1
+    restart: always
+    ports:
+      - "8001:8001"
+    environment:
+      WITH_FRONTEND: "true"
+      SWAGGER_HOST: 127.0.0.1
+      LOCAL_LISTEN_PORT: 8001
+      WAIT_HOSTS: db:3306
+      WAIT_HOSTS_TIMEOUT: 300
+      WAIT_SLEEP_INTERVAL: 5
+      WAIT_HOST_CONNECT_TIMEOUT: 5
+      DB_DRIVER_NAME: mysql
+      DB_NAME: app-template
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_USER: app-template
+      DB_PASSWORD_FILE: /secret/MYSQL_PASSWORD_FILE
+      DIR_SECRET: /secret
+    volumes:
+      - app-template_secret:/secret
+
+  db:
+    depends_on:
+      - secret
+    image: mysql:8
+    command: --default-authentication-plugin=mysql_native_password
+    restart: always
+    volumes:
+      - app-template_db:/var/lib/mysql
+      - app-template_secret:/secret
+    environment:
+      MYSQL_ROOT_PASSWORD_FILE: /secret/MYSQL_ROOT_PASSWORD_FILE
+      MYSQL_PASSWORD_FILE: /secret/MYSQL_PASSWORD_FILE
+      MYSQL_USER: app-template
+      MYSQL_DATABASE: app-template
+
+volumes:
+  app-template_db:
+  app-template_secret:
