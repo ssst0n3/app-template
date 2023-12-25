@@ -1,6 +1,6 @@
 .PHONY: all shell local build
 
-APP_NAME := "mypassword"
+APP_NAME := mypassword
 
 # mirror
 DEFAULT_CN_APT_MIRROR := "mirrors.tuna.tsinghua.edu.cn"
@@ -40,7 +40,7 @@ build:
 	LDFLAGS=${LDFLAGS} ./release.sh
 
 install: build
-	ln -s bin/release/${APP_NAME}_linux_amd64 /usr/local/bin/${APP_NAME}
+	ln -s $(CURDIR)/bin/release/${APP_NAME}_linux_amd64 /usr/local/bin/${APP_NAME}
 
 image:
 	docker buildx build $(BUILD_OPTS) --load -t "$(DEV_IMAGE)" ${DEBUG_FLGAS} .
@@ -51,3 +51,4 @@ shell: image
 # usage:
 # make binary CN=1 DEBUG=1
 # make shell CN=1 DEBUG=1
+# make install
