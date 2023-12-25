@@ -1,6 +1,6 @@
 .PHONY: all shell local build
 
-APP_NAME := mypassword
+APP_NAME := app
 
 # mirror
 DEFAULT_CN_APT_MIRROR := "mirrors.tuna.tsinghua.edu.cn"
@@ -24,7 +24,7 @@ DEV_IMAGE := ${APP_NAME}-dev
 DOCKER_FLAGS := docker run --rm -ti $(DOCKER_CONTAINER_NAME) $(DOCKER_ENVS) $(DOCKER_MOUNT)
 
 DOCKER_RUN_DOCKER := $(DOCKER_FLAGS) "$(DEV_IMAGE)"
-DOCKERFILE := Dockerfile
+DOCKERFILE := Dockerfile_dev
 
 BUILD_APT_MIRROR := $(if $(APT_MIRROR),--build-arg APT_MIRROR=$(APT_MIRROR))
 BUILD_GO_PROXY := $(if $(GOPROXY),--build-arg GOPROXY=$(GOPROXY))
