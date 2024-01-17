@@ -42,7 +42,7 @@ build:
 install: build
 	ln -s $(CURDIR)/bin/release/${APP_NAME}_linux_amd64 /usr/local/bin/${APP_NAME}
 
-image:
+image: bundle
 	docker buildx build $(BUILD_OPTS) --load -t "$(DEV_IMAGE)" ${DEBUG_FLGAS} .
 
 shell: image
