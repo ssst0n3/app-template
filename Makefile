@@ -44,7 +44,7 @@ build:
 install: build
 	rm -f /usr/local/bin/${APP_NAME} && ln -s $(CURDIR)/bin/release/${APP_NAME}_linux_amd64 /usr/local/bin/${APP_NAME}
 
-image: bundle
+image:
 	docker buildx build $(BUILD_OPTS) --load -t "$(DEV_IMAGE)" ${DEBUG_FLAGS} .
 
 shell: image
