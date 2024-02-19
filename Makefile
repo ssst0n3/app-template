@@ -10,7 +10,7 @@ GOPROXY ?= $(if $(CN),$(DEFAULT_CN_GOPROXY),)
 
 # debug
 PROGRESS_PLAIN := --progress plain
-DEBUG_FLGAS ?= $(if $(DEBUG),$(PROGRESS_PLAIN),)
+DEBUG_FLAGS ?= $(if $(DEBUG),$(PROGRESS_PLAIN),)
 
 # ldflags
 GITCOMMIT := $(shell git rev-parse --short HEAD || echo unsupported)
@@ -45,7 +45,7 @@ install: build
 	ln -s $(CURDIR)/bin/release/${APP_NAME}_linux_amd64 /usr/local/bin/${APP_NAME}
 
 image: bundle
-	docker buildx build $(BUILD_OPTS) --load -t "$(DEV_IMAGE)" ${DEBUG_FLGAS} .
+	docker buildx build $(BUILD_OPTS) --load -t "$(DEV_IMAGE)" ${DEBUG_FLAGS} .
 
 shell: image
 	docker run --rm -ti -v $(CURDIR):/root/app $(DEV_IMAGE) bash
