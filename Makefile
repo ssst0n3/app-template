@@ -13,14 +13,14 @@ PROGRESS_PLAIN := --progress plain
 DEBUG_FLAGS ?= $(if $(DEBUG),$(PROGRESS_PLAIN),)
 
 # ldflags
-GITCOMMIT := $(shell git rev-parse --short HEAD || echo unsupported)
+GIT_COMMIT := $(shell git rev-parse --short HEAD || echo unsupported)
 VERSION := $(shell cat ./VERSION)
-BUILDTIME := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
+BUILD_TIME := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 SLIM_LDFLAGS ?= -s -w
 LDFLAGS := "$(SLIM_LDFLAGS) \
 	-X github.com/ctrsploit/sploit-spec/pkg/version.Version=${VERSION} \
-	-X github.com/ctrsploit/sploit-spec/pkg/version.GitCommit=${GITCOMMIT} \
-	-X github.com/ctrsploit/sploit-spec/pkg/version.BuildTime=${BUILDTIME}"
+	-X github.com/ctrsploit/sploit-spec/pkg/version.GitCommit=${GIT_COMMIT} \
+	-X github.com/ctrsploit/sploit-spec/pkg/version.BuildTime=${BUILD_TIME}"
 
 # image
 DEV_IMAGE := ${APP_NAME}-dev
