@@ -3,11 +3,13 @@
 ARG GO_VERSION=1.21.4
 ARG BASE_DEBIAN_DISTRO="bullseye"
 ARG GOLANG_IMAGE="golang:${GO_VERSION}-${BASE_DEBIAN_DISTRO}"
+ARG APPNAME="app-template"
 
 FROM ${GOLANG_IMAGE} AS base
 ARG APT_MIRROR
 ARG GOPROXY
 ARG SLIM_LDFLAGS
+ARG APPNAME
 WORKDIR /root/app
 RUN sed -ri "s/(httpredir|deb).debian.org/${APT_MIRROR:-deb.debian.org}/g" /etc/apt/sources.list \
  && sed -ri "s/(security).debian.org/${APT_MIRROR:-security.debian.org}/g" /etc/apt/sources.list \
@@ -24,20 +26,20 @@ RUN --mount=type=cache,target=/root/.cache/go-build \
 FROM base AS build-env
 WORKDIR /root/app
 COPY --from=gox /build/ /usr/local/bin/
-RUN --mount=type=cache,sharing=locked,id=app_template-build-aptlib,target=/var/lib/apt \
-    --mount=type=cache,sharing=locked,id=app_template-build-aptcache,target=/var/cache/apt \
+RUN --mount=type=cache,sharing=locked,id=${APPNAME}-build-aptlib,target=/var/lib/apt \
+    --mount=type=cache,sharing=locked,id=${APPNAME}-build-aptcache,target=/var/cache/apt \
         apt update && apt install -y \
             upx jq
 RUN --mount=type=bind,target=.,rw \
-    --mount=type=cache,target=/root/.cache/go-build,id=app_template-build \
-    --mount=type=cache,target=/go/pkg/mod,id=app_template-mod \
+    --mount=type=cache,target=/root/.cache/go-build,id=${APPNAME}-build \
+    --mount=type=cache,target=/go/pkg/mod,id=${APPNAME}-mod \
     --mount=type=tmpfs,target=/go/src/ \
     GOPROXY=${GOPROXY} go mod download
 
 FROM build-env AS build
 RUN --mount=type=bind,target=.,rw \
-    --mount=type=cache,target=/root/.cache/go-build,id=app_template-build \
-    --mount=type=cache,target=/go/pkg/mod,id=app_template-mod \
+    --mount=type=cache,target=/root/.cache/go-build,id=${APPNAME}-build \
+    --mount=type=cache,target=/go/pkg/mod,id=${APPNAME}-mod \
     --mount=type=tmpfs,target=/go/src/ \
     make build && mv bin/release /build
 
