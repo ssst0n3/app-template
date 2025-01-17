@@ -1,4 +1,3 @@
-version: '3'
 services:
   secret:
     image: ssst0n3/docker_secret:v1.4.1
