@@ -14,7 +14,7 @@ DEBUG_FLAGS ?= $(if $(DEBUG),$(PROGRESS_PLAIN),)
 
 # ldflags
 GIT_COMMIT := $(shell git rev-parse --short HEAD || echo unsupported)
-VERSION := $(shell cat ./VERSION)
+VERSION := $(shell ./script/version.sh)
 BUILD_TIME := $(shell date -u +"%Y-%m-%dT%H:%M:%SZ")
 SLIM_LDFLAGS ?= -s -w
 LDFLAGS := "$(SLIM_LDFLAGS) \
